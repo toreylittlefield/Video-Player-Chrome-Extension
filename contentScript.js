@@ -11,6 +11,7 @@ const sendRunTimeMessageToBackgroundJSAndUpdatePlaybackRate = (
       if (response?.message === 'foundVideoSuccess') {
         if (response.payload !== null) {
           videoElement.playbackRate = response.payload;
+          videoElement.dataset.CustomPlaybackRate = videoElement.playbackRate;
         }
       }
     }
@@ -32,83 +33,93 @@ const setAndCheckVideoPlayBackRate = (
   return true;
 };
 
-function checkForVideoInChildNodes(node, parent, added) {
-  // Only proceed with supposed removal if node is missing from DOM
-  if (!added && document.body.contains(node)) {
-    return;
+const setThePlaybackRate = (
+  videoElement = {},
+  request = { payload: Number }
+) => {
+  if (videoElement) {
+    videoElement.playbackRate = request.payload;
+    videoElement.dataset.CustomPlaybackRate = videoElement.playbackRate;
   }
-  if (
-    node.nodeName === 'VIDEO' ||
-    node.nodeName === 'AUDIO'
-    //  &&
-    // // jw-video jw-reset parent className for the typical  jw-player
-    // node.className === 'jw-video jw-reset'
-  ) {
-    if (added) {
-      const span = document.createElement('div');
-      span.textContent = 'SECRET CODE 1234';
-      span.className = 'secret-code';
-      let shadow = span.attachShadow({
-        mode: 'open',
-      });
+};
 
-      shadow.innerHTML = `
-      <span></span>
-          `;
-      parent.prepend(span);
-      const videoElement = parent.querySelector('video');
-      if (videoElement) {
-        videoElement.dataset.CustomPlaybackRate = videoElement.playbackRate;
+const addListenerToVideoTagAndSendVideoFoundMessage = (parent = {}) => {
+  let videoElement = parent.querySelector('video');
 
-        // listen to messages to update the playback speed value based on slider & chrome storage
-        chrome.runtime.onMessage.addListener(
-          (request, sender, sendResponse) => {
-            if (request.message === 'changePlaybackSpeed') {
-              if (videoElement) {
-                videoElement.playbackRate = request.payload;
-              }
-              sendResponse({
-                message: 'success',
-                payload: videoElement.playbackRate,
-              });
-              return true;
-            }
-            if (request.message === 'getPlayBackSpeedOnPageLoad') {
-              if (videoElement) {
-                videoElement.playbackRate = request.payload;
+  if (!videoElement) return false;
 
-                // hack to set an interval in case the default video play back speed overrides our user playback speed store in chome local storage
-                const timeout = setTimeout(() => {
-                  const intervalTimer = setInterval(() => {
-                    if (setAndCheckVideoPlayBackRate(request, videoElement))
-                      clearInterval(intervalTimer);
-                  }, 500);
-                  clearTimeout(timeout);
-                }, 500);
-              }
-              sendResponse({
-                message: 'success',
-                payload: videoElement.playbackRate,
-              });
-              return true;
-            }
-          }
-        );
+  console.log({ videoElement, playbackRate: videoElement?.playbackRate });
 
-        // send message to chrome background.js and retrieve the playbackrate
-        sendRunTimeMessageToBackgroundJSAndUpdatePlaybackRate(videoElement);
+  setThePlaybackRate(
+    videoElement,
+    (request = { payload: videoElement.playbackRate })
+  );
+
+  console.log('adding listeners...');
+  // listen to messages to update the playback speed value based on slider & chrome storage
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log({ request, sender, sendResponse });
+    console.log({ speedBeforeMessage: videoElement.playbackRate });
+    if (
+      request.message === 'changePlaybackSpeed' ||
+      request.message === 'getPlayBackSpeedOnPageLoad'
+    ) {
+      if (document.location.hostname === 'www.netflix.com') {
+        // update when netflix because of React??
+        const timeout = setTimeout(() => {
+          const intervalTimer = setInterval(() => {
+            videoElement = document.querySelector('video');
+            if (setAndCheckVideoPlayBackRate(request, videoElement))
+              clearInterval(intervalTimer);
+          }, 500);
+          clearTimeout(timeout);
+        }, 500);
       }
-    } else {
-      // removed nodes
+      // should only occur once per page load event...
+      if (request.message === 'getPlayBackSpeedOnPageLoad') {
+        // hack to set an interval in case the default video play back speed overrides our user playback speed store in chome local storage
+        const timeout = setTimeout(() => {
+          const intervalTimer = setInterval(() => {
+            if (setAndCheckVideoPlayBackRate(request, videoElement))
+              clearInterval(intervalTimer);
+          }, 500);
+          clearTimeout(timeout);
+        }, 500);
+      }
+      // from the slider to background and passed here
+      if (request.message === 'changePlaybackSpeed') {
+        setThePlaybackRate(videoElement, request);
+      }
+      sendResponse({
+        message: 'success',
+        payload: videoElement.playbackRate,
+      });
+      console.log({ speedAfterMessage: videoElement.playbackRate });
+      return true;
     }
+    sendResponse({});
+  });
+  // send message to chrome background.js and retrieve the playbackrate
+  console.log('found video and sending message...');
+  sendRunTimeMessageToBackgroundJSAndUpdatePlaybackRate(videoElement);
+};
+
+const checkForVideoInChildNodes = (node = {}, parent = {}) => {
+  // // jw-video jw-reset parent className for the typical  jw-player
+  // node.className === 'jw-video jw-reset'
+  if (node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO') {
+    console.log({ node, parent });
+    addListenerToVideoTagAndSendVideoFoundMessage(parent);
+    // recurse over any child nodes
   } else if (node.children !== undefined) {
     for (var i = 0; i < node.children.length; i++) {
       const child = node.children[i];
-      checkForVideoInChildNodes(child, child.parentNode || parent, added);
+      checkForVideoInChildNodes(child, child.parentNode || parent);
     }
   }
-}
+};
 
+// mutation observer for each document in the window to find VIDEO or IFRAMES
 const mutate = (document) => {
   var observer = new MutationObserver((mutations) => {
     mutations.forEach((mutationRecord) => {
@@ -122,22 +133,7 @@ const mutate = (document) => {
         .forEach((videoNode) => {
           checkForVideoInChildNodes(
             videoNode,
-            videoNode.parentNode || mutationRecord.target,
-            true
-          );
-        });
-      // removed nodes
-      Array.from(mutationRecord.removedNodes)
-        .filter((addedNode) => {
-          return (
-            addedNode.nodeName === 'VIDEO' || addedNode.nodeName === 'IFRAME'
-          );
-        })
-        .forEach((videoNode) => {
-          checkForVideoInChildNodes(
-            videoNode,
-            videoNode.parentNode || mutationRecord.target,
-            true
+            videoNode.parentNode ?? mutationRecord.target
           );
         });
     });
@@ -145,6 +141,7 @@ const mutate = (document) => {
   observer.observe(document, { childList: true, subtree: true });
 };
 
+// Find IFrames
 const getIframeDocs = () => {
   const iframeTags = document.getElementsByTagName('iframe');
   const filterIframes = Array.from(iframeTags)
@@ -159,33 +156,34 @@ const getAllDocs = () => {
   return docs;
 };
 
-const checkForTheExistingShadowClass = () => {
-  const foundShadowElements = document.querySelectorAll('.secret-code');
-  if (!foundShadowElements) return;
-  let parentElementOfShadows = [];
-  foundShadowElements.forEach((shadow) =>
-    parentElementOfShadows.push(shadow.parentElement)
-  );
-  return parentElementOfShadows;
-};
+const checkIfMatchesURL = async () => {
+  console.log('checking url...');
+  let regex = new RegExp('netflix', 'g');
+  if (regex.test(document.location.orgin) || regex.test(document.URL)) {
+    // setup listeners no need to run mutation observer
+    console.log(document.location.origin);
+    const videoElement = () => document.querySelector('video');
+    const intervalTimer = setInterval(() => {
+      if (videoElement()) {
+        addListenerToVideoTagAndSendVideoFoundMessage(window.document.body);
+        clearInterval(intervalTimer);
+      }
+    }, 1000);
 
-const getVideoElementsFromParentElements = (parentElements) => {
-  parentElements.forEach((parent) => {
-    const videoPlayerElement = parent.querySelector('video');
-    if (videoPlayerElement) {
-      sendRunTimeMessageToBackgroundJSAndUpdatePlaybackRate(videoPlayerElement);
-    }
-  });
+    return true;
+  }
+  return false;
 };
-
 (async function init() {
-  if (window.document) {
-    const ourShadowElements = checkForTheExistingShadowClass();
-    if (ourShadowElements.length > 0) {
-      getVideoElementsFromParentElements(ourShadowElements);
-    } else {
-      const allDocsOnPage = getAllDocs();
-      allDocsOnPage.forEach(mutate);
-    }
+  const isMatchedURL = await checkIfMatchesURL();
+  if (!isMatchedURL && window.document) {
+    console.log('Running Mutation Observer');
+    // const ourShadowElements = checkForTheExistingShadowClass();
+    // if (ourShadowElements.length > 0) {
+    //   getVideoElementsFromParentElements(ourShadowElements);
+    // } else {
+    // }
+    const allDocsOnPage = getAllDocs();
+    allDocsOnPage.forEach(mutate);
   }
 })();

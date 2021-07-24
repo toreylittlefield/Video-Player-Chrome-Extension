@@ -44,9 +44,18 @@ const updateVideoSpeedInCurrentTabWindow = async (request) => {
   updatePlaybackSpeedInCurrentTab(currentTab, request);
 };
 
+let regex = new RegExp('netflix', 'g');
+
+const checkForVideo = () =>
+  document.querySelector('video')?.playbackRate ?? null;
+
 // run when a new active tab and send store user playbackspeed to the contentScript event listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (tab.active && changeInfo.status === 'complete' && /^http/.test(tab.url)) {
+    // netflix
+    if (regex.test(tab.url)) {
+      setEnabledPopup(tab.id);
+    }
     chrome.storage.local.get('playbackspeed', (data) => {
       if (data) {
         updatePlaybackSpeedInCurrentTab(
@@ -56,6 +65,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           },
           'getPlayBackSpeedOnPageLoad'
         );
+        // }
       }
     });
   }
