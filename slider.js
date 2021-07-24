@@ -19,11 +19,15 @@ const sendUpdatedPlaybackSpeedToBackground = (newValueFromSlider) => {
 const handleOnInputChange = ({ target = { value: Number } }) => {
   let rangeInput = document.querySelector('.slider-input');
   let h4Selector = document.querySelector('h4');
+  let currentSpeedSelector = document.querySelector(
+    '.current-speed-container strong'
+  );
   const value = parseFloat(target.value);
   const fractionalValue = value / 10;
-  // update the input value & the h4 text
-  document.querySelector('.slider-input').value = value;
-  h4Selector.innerHTML = fractionalValue + '<span></span>';
+  // update the input value & the h4 text & current speed value
+  rangeInput.value = value;
+  h4Selector.innerHTML = fractionalValue.toFixed(1) + '<span></span>';
+  currentSpeedSelector.textContent = fractionalValue.toFixed(1) + 'X';
   // css updates
   rangeInput.style.filter = `hue-rotate(-${value}deg)`;
   h4Selector.firstElementChild.style.filter = `hue-rotate(-${value}deg)`;
