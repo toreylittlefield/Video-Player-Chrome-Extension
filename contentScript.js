@@ -23,7 +23,7 @@ const setAndCheckVideoPlayBackRate = (
   request = { payload: Number },
   videoElement = {}
 ) => {
-  if (request.payload === undefined) return true;
+  if (request.payload === undefined || !videoElement) return true;
   const currentPlayBackRate = videoElement.playbackRate;
   const payload = Number(request.payload);
   if (currentPlayBackRate !== payload) {
@@ -61,11 +61,14 @@ const addListenerToVideoTagAndSendVideoFoundMessage = (parent = {}) => {
       request.message === 'getPlayBackSpeedOnPageLoad'
     ) {
       if (document.location.hostname === 'www.netflix.com') {
-        // update when netflix because of React??
+        // hacky way to deal with updating video tag when netflix because of React??
         const timeout = setTimeout(() => {
           const intervalTimer = setInterval(() => {
             videoElement = document.querySelector('video');
-            if (setAndCheckVideoPlayBackRate(request, videoElement))
+            if (
+              videoElement &&
+              setAndCheckVideoPlayBackRate(request, videoElement)
+            )
               clearInterval(intervalTimer);
           }, 500);
           clearTimeout(timeout);
