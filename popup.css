@@ -1,3 +1,4 @@
+/* Range Slider From https://codepen.io/brandonmcconnell/pen/oJBVQW */
 html {
   height: 100%;
   display: flex;
@@ -14,8 +15,9 @@ html h5,
 html h6 {
   margin: 0;
 }
-html h1 {
-  color: #333;
+html h1,
+html h2 {
+  color: rgba(53, 52, 52, 1);
   font-weight: 500;
 }
 html h3 {
@@ -39,36 +41,35 @@ html input[type='range'] {
   margin: 24px 0 16px;
   transition: box-shadow 0.2s ease-in-out;
 }
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  html input[type='range'] {
-    overflow: hidden;
-    height: 40px;
-    -webkit-appearance: none;
-    background-color: #ddd;
-  }
-  html input[type='range']::-webkit-slider-runnable-track {
-    height: 40px;
-    -webkit-appearance: none;
-    color: #444;
-    -webkit-transition: box-shadow 0.2s ease-in-out;
-    transition: box-shadow 0.2s ease-in-out;
-  }
-  html input[type='range']::-webkit-slider-thumb {
-    width: 40px;
-    -webkit-appearance: none;
-    height: 40px;
-    cursor: ew-resize;
-    background: #fff;
-    box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
-    border-radius: 50%;
-    -webkit-transition: box-shadow 0.2s ease-in-out;
-    transition: box-shadow 0.2s ease-in-out;
-    position: relative;
-  }
-  html input[type='range']:active::-webkit-slider-thumb {
-    background: #fff;
-    box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
-  }
+
+html input[type='range'] {
+  overflow: hidden;
+  height: 40px;
+  -webkit-appearance: none;
+  background-color: #ddd;
+}
+html input[type='range']::-webkit-slider-runnable-track {
+  height: 40px;
+  -webkit-appearance: none;
+  color: #444;
+  -webkit-transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
+}
+html input[type='range']::-webkit-slider-thumb {
+  width: 40px;
+  -webkit-appearance: none;
+  height: 40px;
+  cursor: ew-resize;
+  background: #fff;
+  box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
+  border-radius: 50%;
+  -webkit-transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
+  position: relative;
+}
+html input[type='range']:active::-webkit-slider-thumb {
+  background: #fff;
+  box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
 }
 html input[type='range']::-moz-range-progress {
   background-color: #43e5f7;
@@ -121,11 +122,35 @@ html input[type='range']::-ms-fill-upper {
 }
 
 input:not(:active) + #h4-container h4 {
-  opacity: 0.8;
-  margin-top: -20px;
+  opacity: 0;
+  margin-top: -50px;
   pointer-events: none;
 }
 
+/* To Display Current Selected Speed */
+
+.current-speed-container {
+  text-align: left;
+}
+
+.current-speed-container h2 {
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.5em;
+  color: rgba(53, 52, 52, 0.8);
+  transition: all 0.2s ease-in-out;
+}
+
+.current-speed-container h2 strong {
+  font-style: normal;
+  color: rgba(53, 52, 52, 1);
+}
+
+input:active ~ .current-speed-container h2 {
+  opacity: 0;
+}
+
+/* For disabled.html */
 .disabled {
   display: grid;
   width: 200px;
