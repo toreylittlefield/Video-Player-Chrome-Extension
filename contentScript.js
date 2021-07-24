@@ -60,7 +60,10 @@ const addListenerToVideoTagAndSendVideoFoundMessage = (parent = {}) => {
       request.message === 'changePlaybackSpeed' ||
       request.message === 'getPlayBackSpeedOnPageLoad'
     ) {
-      if (document.location.hostname === 'www.netflix.com') {
+      if (
+        document.location.hostname === 'www.netflix.com' &&
+        request.message === 'getPlayBackSpeedOnPageLoad'
+      ) {
         // hacky way to deal with updating video tag when netflix because of React??
         const timeout = setTimeout(() => {
           const intervalTimer = setInterval(() => {
@@ -163,6 +166,7 @@ const checkIfMatchesURL = async () => {
     const videoElement = () => document.querySelector('video');
     const intervalTimer = setInterval(() => {
       if (videoElement()) {
+        console.log('adding listeners for netflix...');
         addListenerToVideoTagAndSendVideoFoundMessage(window.document.body);
         clearInterval(intervalTimer);
       }
