@@ -1,6 +1,5 @@
 // set to enabled popup html
 const setEnabledPopup = (tabId) => {
-  console.log({ tabId });
   chrome.action.setPopup({
     tabId: tabId,
     popup: 'popup.html',
@@ -30,9 +29,13 @@ const updatePlaybackSpeedInCurrentTab = async (
       payload: request.payload,
     },
     (response) => {
-      if (response?.message === 'success') {
+      // should only run once on video load getPlayBackSpeedOnPageLoad to enable the popup
+      if (
+        response?.message === 'success' &&
+        message === 'getPlayBackSpeedOnPageLoad'
+      ) {
         console.log('enabled!');
-        console.log({ response });
+        console.log({ response, message });
         setEnabledPopup(currentTab.id);
       }
     }

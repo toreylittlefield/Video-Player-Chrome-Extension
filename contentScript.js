@@ -48,18 +48,14 @@ const addListenerToVideoTagAndSendVideoFoundMessage = (parent = {}) => {
 
   if (!videoElement) return false;
 
-  console.log({ videoElement, playbackRate: videoElement?.playbackRate });
-
   setThePlaybackRate(
     videoElement,
     (request = { payload: videoElement.playbackRate })
   );
 
-  console.log('adding listeners...');
+  console.log('adding video listeners...');
   // listen to messages to update the playback speed value based on slider & chrome storage
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log({ request, sender, sendResponse });
-    console.log({ speedBeforeMessage: videoElement.playbackRate });
     if (
       request.message === 'changePlaybackSpeed' ||
       request.message === 'getPlayBackSpeedOnPageLoad'
@@ -94,7 +90,6 @@ const addListenerToVideoTagAndSendVideoFoundMessage = (parent = {}) => {
         message: 'success',
         payload: videoElement.playbackRate,
       });
-      console.log({ speedAfterMessage: videoElement.playbackRate });
       return true;
     }
     sendResponse({});
@@ -178,11 +173,6 @@ const checkIfMatchesURL = async () => {
   const isMatchedURL = await checkIfMatchesURL();
   if (!isMatchedURL && window.document) {
     console.log('Running Mutation Observer');
-    // const ourShadowElements = checkForTheExistingShadowClass();
-    // if (ourShadowElements.length > 0) {
-    //   getVideoElementsFromParentElements(ourShadowElements);
-    // } else {
-    // }
     const allDocsOnPage = getAllDocs();
     allDocsOnPage.forEach(mutate);
   }
