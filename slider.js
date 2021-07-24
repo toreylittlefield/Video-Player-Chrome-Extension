@@ -43,6 +43,15 @@ sliderInput.addEventListener('input', (event) => {
   handleOnInputChange(event);
 });
 
+let button = document.querySelector('button');
+button.addEventListener('click', (event) => {
+  event.preventDefault();
+  // must be 10 to reset speed to 1 because of the slider range value
+  const resetValue = { target: { value: 10 } };
+  handleOnInputChange(resetValue);
+  window.close();
+});
+
 // the slider in popup.html on open
 const updateSliderValues = (payloadValue = Number) => {
   const event = { target: { value: payloadValue * 10 } };

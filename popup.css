@@ -130,6 +130,10 @@ input:not(:active) + #h4-container h4 {
 /* To Display Current Selected Speed */
 
 .current-speed-container {
+  display: flex;
+  align-content: flex-start;
+  align-items: center;
+  justify-content: space-around;
   text-align: left;
 }
 
@@ -148,6 +152,26 @@ input:not(:active) + #h4-container h4 {
 
 input:active ~ .current-speed-container h2 {
   opacity: 0;
+}
+
+.custom-button {
+  border: 0.01em rgba(0, 0, 0, 0.3) solid;
+  border-radius: 0.6em;
+  padding: 0.5em;
+  font-size: 1.25em;
+  background-color: rgba(138, 29, 138, 1);
+  color: hsl(0, 0%, 95%);
+  transition: all 0.2s ease-in-out;
+  box-shadow: 3px 3.5px 2px 1px rgba(0, 0, 0, 0.3);
+}
+.custom-button:hover {
+  background-color: rgba(102, 7, 102, 0.85);
+  transform: translateX(2%) scale(1.05);
+}
+.custom-button:active {
+  background-color: rgba(73, 11, 73, 0.75);
+  transform: translateX(-1%) translateY(3%) scale(1.02);
+  box-shadow: none;
 }
 
 /* For disabled.html */
