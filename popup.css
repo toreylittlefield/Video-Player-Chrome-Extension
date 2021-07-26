@@ -175,8 +175,33 @@ input:active ~ .current-speed-container h2 {
 }
 
 /* Netflix Subtitles */
+.subtitles-container {
+  margin-top: 5em;
+}
+
+.subtitles-container ul {
+  padding-inline-start: 0;
+  text-align: start;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}
+
 li {
   list-style-type: none;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 20px;
+}
+
+li label {
+  width: 65%;
+}
+
+li input,
+li select {
+  width: 35%;
 }
 
 /* For disabled.html */
