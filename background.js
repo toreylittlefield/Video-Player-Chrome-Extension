@@ -30,10 +30,7 @@ const updatePlaybackSpeedInCurrentTab = async (
     },
     (response) => {
       // should only run once on video load getPlayBackSpeedOnPageLoad to enable the popup
-      if (
-        response?.message === 'success' &&
-        message === 'getPlayBackSpeedOnPageLoad'
-      ) {
+      if (response?.message === 'success' && message === 'getPlayBackSpeedOnPageLoad') {
         console.log('enabled!');
         console.log({ response, message });
         setEnabledPopup(currentTab.id);
@@ -49,15 +46,40 @@ const updateVideoSpeedInCurrentTabWindow = async (request) => {
 
 let regex = new RegExp('netflix', 'g');
 
-const checkForVideo = () =>
-  document.querySelector('video')?.playbackRate ?? null;
+const checkForVideo = () => document.querySelector('video')?.playbackRate ?? null;
 
 // run when a new active tab and send store user playbackspeed to the contentScript event listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (tab.active && changeInfo.status === 'complete' && /^http/.test(tab.url)) {
     // netflix
     if (regex.test(tab.url)) {
+      console.log({ tabId, changeInfo, tab });
       setEnabledPopup(tab.id);
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tab.id },
+          files: ['netflix_subtitles.js'],
+        },
+        () => {
+          chrome.tabs.sendMessage(
+            tabId,
+            {
+              message: 'update_netflix_subtitles_styles',
+              payload: {
+                verticalPosition: 0,
+                fontSize: 70,
+                fontColor: '#FFF',
+                fontWeight: 'normal',
+              },
+            },
+            (subResponse) => {
+              if (subResponse?.message === 'netflix subtitles styles enabled') {
+                console.log({ subTitlesMsg: subResponse.message });
+              }
+            }
+          );
+        }
+      );
     }
     chrome.storage.local.get('playbackspeed', (data) => {
       if (data) {
@@ -135,4 +157,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   }
+
+  // if (request.message === 'isNetFlix') {
+  //   console.log('isNetflix');
+  //   console.log({ isNetlfix: request.message });
+  //   let queryOptions = { active: true, currentWindow: true };
+  //   chrome.tabs.query(queryOptions, (tabs) => {
+  //     if (tabs) {
+  //       const [currentTab] = tabs;
+  //       console.log(currentTab);
+  //       console.log({ currentTabURL: currentTab.url });
+  //       if (regex.test(currentTab?.url)) {
+  //         console.log('sending back success message to popup.html for netflix form...');
+  //         sendResponse({
+  //           message: 'success',
+  //           payload: true,
+  //         });
+  //       }
+  //     }
+  //   });
+  //   return true;
+  // }
 });
