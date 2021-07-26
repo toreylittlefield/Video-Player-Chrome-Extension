@@ -2,10 +2,12 @@ let regex = new RegExp('netflix', 'g');
 let queryOptions = { active: true, currentWindow: true };
 let formInputsToQuery = ['verticalPosition', 'fontSize', 'fontColor', 'fontWeight'];
 
+// is netflix?
 const checkUrlIsNetFlix = (tab) => {
   return regex.test(tab?.url);
 };
 
+// create our option elements
 const createSelectOptionElements = (key = '', propValue = []) => {
   if (key !== 'options') return;
   propValue?.optionsValues.forEach((option) => {
@@ -21,6 +23,7 @@ const createSelectOptionElements = (key = '', propValue = []) => {
   });
 };
 
+// create elements with props / attributes
 const createElements = (elements = [{}]) => {
   elements.forEach((element) => {
     // create & attach as child to parent element
@@ -200,6 +203,7 @@ const formListener = (currentTab = {}) => {
       ...formInputsToQuery.map((inputId) => event.target[inputId].value),
     ];
     console.log({ verticalPosition, fontColor, fontSize, fontWeight });
+    // send the updated values to netflix_subtitles.js on submit
     chrome.tabs.sendMessage(
       currentTab.id,
       {
@@ -215,6 +219,7 @@ const formListener = (currentTab = {}) => {
   });
 };
 
+// runs when the popup.html is open
 chrome.tabs.query(queryOptions, (tabs) => {
   if (!tabs) return;
   const [currentTab] = tabs;
