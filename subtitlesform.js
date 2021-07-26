@@ -1,127 +1,227 @@
 let regex = new RegExp('netflix', 'g');
 let queryOptions = { active: true, currentWindow: true };
-let formInputs = ['verticalPosition', 'fontSize', 'fontColor', 'fontWeight'];
-chrome.tabs.query(queryOptions, (tabs) => {
-  if (tabs) {
-    const [currentTab] = tabs;
-    console.log(currentTab);
-    console.log({ currentTabURL: currentTab.url });
-    if (regex.test(currentTab?.url)) {
-      console.log('sending back success message to popup.html for netflix form...');
-      const subTitlesContainerSelector = document.querySelector('.subtitles-container');
-      // section title
-      const H2Element = document.createElement('h2');
-      H2Element.textContent = 'Adjust Netflix Subtitles';
-      subTitlesContainerSelector.appendChild(H2Element);
+let formInputsToQuery = ['verticalPosition', 'fontSize', 'fontColor', 'fontWeight'];
 
-      // form
-      const form = document.createElement('form');
-      form.id = 'subtitles-form';
-      //fieldset
-      const fieldSet = document.createElement('fieldset');
-      subTitlesContainerSelector.appendChild(form);
-      form.appendChild(fieldSet);
-      // lengend
-      const legendElement = document.createElement('legend');
-      legendElement.textContent = 'Subtitle Styles';
-      fieldSet.appendChild(legendElement);
-      // ul
-      const ULElement = document.createElement('ul');
-      fieldSet.appendChild(ULElement);
+const checkUrlIsNetFlix = (tab) => {
+  return regex.test(tab?.url);
+};
 
-      formInputs.forEach((inputEl) => {
-        const LIElement = document.createElement('li');
-        const label = document.createElement('label');
-        const input = document.createElement('input');
-        if (inputEl === 'fontColor') {
-          input.type = 'color';
-        } else if (inputEl === 'fontWeight') {
-          input.type = 'number';
-          // create datalist with options
-          const dataList = document.createElement('datalist');
-          dataList.id = 'fontWeight-options';
-          //options in datalist
-          const optionsForDataList = [100, 200, 300, 400, 500, 600, 700, 800, 900];
-          optionsForDataList.forEach((option) => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option;
-            dataList.appendChild(optionElement);
-          });
-          input.append(dataList);
-          input.setAttribute('list', dataList.id);
-          console.log({ dataList, input });
-          input.step = 100;
-          input.min = 100;
-          input.max = 900;
-          input.defaultValue = 600;
-        } else {
-          input.type = 'number';
-        }
-        input.value = '';
-        label.for = inputEl;
-        input.id = inputEl;
-        label.textContent = `Change the: ${inputEl}`;
-        LIElement.appendChild(label);
-        LIElement.appendChild(input);
-        ULElement.appendChild(LIElement);
-      });
-      // button
-      const button = document.createElement('button');
-      button.className = 'set-subtitles-btn';
-      button.type = 'submit';
-      button.textContent = 'Change Subtitles';
-      fieldSet.appendChild(button);
-
-      const formToSubmit = document.querySelector('#subtitles-form');
-
-      formToSubmit.addEventListener('submit', (event) => {
-        event.preventDefault();
-        console.log(event.target);
-        const [verticalPosition, fontSize, fontColor, fontWeight] = [
-          ...formInputs.map((inputId) => event.target[inputId].value),
-        ];
-        console.log({ verticalPosition, fontColor, fontSize, fontWeight });
-        chrome.tabs.sendMessage(
-          currentTab.id,
-          {
-            message: 'update_netflix_subtitles_styles',
-            payload: { verticalPosition, fontSize, fontColor, fontWeight },
-          },
-          (responseSubtitles) => {
-            if (responseSubtitles?.message === 'netflix subtitles styles enabled') {
-              console.log({ subTitlesMsg: responseSubtitles.message });
-            }
-          }
-        );
-      });
-      // sendResponse({
-      //   message: 'success',
-      //   payload: true,
-      // });
+const createSelectOptionElements = (key = '', propValue = []) => {
+  if (key !== 'options') return;
+  propValue?.optionsValues.forEach((option) => {
+    const optionElement = document.createElement('option');
+    const parentSelectElement = document.querySelector(propValue?.parentToAppendTo);
+    parentSelectElement.appendChild(optionElement);
+    optionElement.value = option;
+    optionElement.textContent = option;
+    // selected value
+    if (propValue?.selected === option) {
+      optionElement.selected = propValue.selected;
     }
-  }
+  });
+};
+
+const createElements = (elements = [{}]) => {
+  elements.forEach((element) => {
+    // create & attach as child to parent element
+    const createdElement = document.createElement(element.tagName);
+    const parentElement = document.querySelector(element.appendAsChild);
+    parentElement.appendChild(createdElement);
+
+    // add all props
+    const keys = Object.keys(element);
+    keys.forEach((key) => {
+      if (key !== 'tagName' || key !== 'appendAsChild') {
+        const propValue = element[key];
+        if (propValue) createdElement[key] = propValue;
+        // create options elements for select elements
+        if (key === 'options') createSelectOptionElements(key, propValue);
+      }
+    });
+  });
+};
+
+const createParentElements = () => {
+  const elements = [
+    {
+      tagName: 'h2',
+      textContent: 'Adjust Netflix Subtitles',
+      id: '',
+      className: '',
+      type: '',
+      appendAsChild: '.subtitles-container',
+    },
+    {
+      tagName: 'form',
+      textContent: '',
+      id: 'subtitles-form',
+      className: '',
+      type: '',
+      appendAsChild: '.subtitles-container',
+    },
+    { tagName: 'fieldset', textContent: '', id: '', className: '', type: '', appendAsChild: 'form' },
+    {
+      tagName: 'legend',
+      textContent: 'Subtitle Styles',
+      id: '',
+      className: '',
+      type: '',
+      appendAsChild: 'fieldset',
+    },
+    { tagName: 'ul', textContent: '', id: '', className: 'form-list', type: '', appendAsChild: 'fieldset' },
+    {
+      tagName: 'button',
+      textContent: 'Change Subtitles',
+      id: '',
+      className: 'set-subtitles-btn',
+      type: 'submit',
+      appendAsChild: 'fieldset',
+    },
+  ];
+  createElements(elements);
+};
+
+const createFormLabels = () => {
+  let formInputs = [
+    {
+      name: 'verticalPosition',
+      tagName: 'input',
+      forAndId: 'verticalPosition',
+      labelText: 'Adjust Vertical Position',
+      placeholder: '0',
+      inputType: 'number',
+      inputMin: -100,
+      inputMax: 1200,
+      inputStep: 1,
+      defaultValue: 0,
+    },
+    {
+      name: 'fontSize',
+      tagName: 'input',
+      forAndId: 'fontSize',
+      labelText: 'Adjust Subtitles Size',
+      placeholder: '50',
+      inputType: 'number',
+      inputMin: 10,
+      inputMax: 100,
+      inputStep: 2,
+      defaultValue: 32,
+    },
+    {
+      name: 'fontColor',
+      tagName: 'input',
+      forAndId: 'fontColor',
+      labelText: 'Select The Font Color',
+      placeholder: null,
+      inputType: 'color',
+      inputMin: null,
+      inputMax: null,
+      inputStep: null,
+      defaultValue: '#ffffff',
+    },
+    {
+      name: 'fontWeight',
+      tagName: 'select',
+      forAndId: 'fontWeight',
+      labelText: 'Select Font Thickness',
+      placeholder: '600',
+      options: {
+        parentToAppendTo: '#fontWeight',
+        optionsValues: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+        selected: 500,
+      },
+      inputType: 'number',
+      inputMin: 100,
+      inputMax: 900,
+      inputStep: 100,
+      defaultValue: 600,
+    },
+  ];
+  const formElements = [
+    {
+      tagName: 'li',
+      textContent: '',
+      id: '',
+      className: '',
+      type: '',
+      for: '',
+      appendAsChild: '.form-list',
+    },
+    {
+      tagName: 'label',
+      textContent: '',
+      id: '',
+      className: '',
+      type: '',
+      for: '',
+      appendAsChild: '',
+    },
+    {
+      tagName: 'input',
+      textContent: '',
+      id: '',
+      className: '',
+      type: '',
+      for: '',
+      appendAsChild: '',
+    },
+  ];
+  // create the props for each element
+  formInputs.forEach((formInput) => {
+    const [li, label, input] = [...formElements];
+    li.className = formInput.name + '-li';
+    label.appendAsChild = '.' + li.className;
+    label.textContent = formInput.labelText;
+    label.for = formInput.forAndId;
+    input.tagName = formInput.tagName;
+    input.id = formInput.forAndId;
+    input.name = formInput.name;
+    input.type = formInput.inputType;
+    input.placeholder = formInput.placeholder;
+    input.value = formInput.defaultValue;
+    input.min = formInput.inputMin;
+    input.max = formInput.inputMax;
+    input.step = formInput.inputStep;
+    input.appendAsChild = '.' + li.className;
+    if (formInput.options) {
+      input.options = formInput.options;
+    }
+    createElements(formElements);
+  });
+};
+
+// add the form listener
+const formListener = (currentTab = {}) => {
+  const formToSubmit = document.querySelector('#subtitles-form');
+  formToSubmit.addEventListener('submit', (event) => {
+    event.preventDefault();
+    console.log(event.target);
+    const [verticalPosition, fontSize, fontColor, fontWeight] = [
+      ...formInputsToQuery.map((inputId) => event.target[inputId].value),
+    ];
+    console.log({ verticalPosition, fontColor, fontSize, fontWeight });
+    chrome.tabs.sendMessage(
+      currentTab.id,
+      {
+        message: 'update_netflix_subtitles_styles',
+        payload: { verticalPosition, fontSize, fontColor, fontWeight },
+      },
+      (responseSubtitles) => {
+        if (responseSubtitles?.message === 'netflix subtitles styles enabled') {
+          console.log({ subTitlesMsg: responseSubtitles.message });
+        }
+      }
+    );
+  });
+};
+
+chrome.tabs.query(queryOptions, (tabs) => {
+  if (!tabs) return;
+  const [currentTab] = tabs;
+  if (!checkUrlIsNetFlix(currentTab)) return;
+  // create parents like form, lengend, button, ul...
+  createParentElements();
+  // create elements inside the form i.e li,labels, inputs...
+  createFormLabels();
+  formListener(currentTab);
 });
-
-// chrome.runtime.sendMessage(
-//   {
-//     message: 'isNetFlix',
-//     payload: null,
-//   },
-//   (responseisNetflix) => {
-//     if (responseisNetflix?.message === 'success') {
-//       console.log('slider.js : chrome storage value response on popup open from background.js');
-//       console.log({ responseisNetflix });
-//       const subTitlesContainerSelector = document.querySelector('.subtitles-container');
-//       const form = document.createElement('form');
-//       const input = document.createElement('input');
-//       const button = document.createElement('button');
-//       button.className = 'set-subtitles-btn';
-//       form.appendChild(input)
-//       button.addEventListener('submit', (e) => {
-//         e.preventDefault();
-
-//       })
-//       subTitlesContainerSelector;
-//     }
-//   }
-// );
