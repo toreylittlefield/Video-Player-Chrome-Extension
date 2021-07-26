@@ -1,9 +1,6 @@
-let regex = new RegExp('netflix', 'g');
-let queryOptions = { active: true, currentWindow: true };
-let formInputsToQuery = ['verticalPosition', 'fontSize', 'fontColor', 'fontWeight'];
-
 // is netflix?
 const checkUrlIsNetFlix = (tab) => {
+  let regex = new RegExp('netflix', 'g');
   return regex.test(tab?.url);
 };
 
@@ -196,11 +193,15 @@ const createFormLabels = () => {
 // add the form listener
 const formListener = (currentTab = {}) => {
   const formToSubmit = document.querySelector('#subtitles-form');
+  const inputAndSelectIdsToSubmit = Array.from(formToSubmit?.querySelectorAll('input, select')).map(
+    (element) => element.id
+  );
+
   formToSubmit.addEventListener('submit', (event) => {
     event.preventDefault();
     console.log(event.target);
     const [verticalPosition, fontSize, fontColor, fontWeight] = [
-      ...formInputsToQuery.map((inputId) => event.target[inputId].value),
+      ...inputAndSelectIdsToSubmit.map((inputId) => event.target[inputId].value),
     ];
     console.log({ verticalPosition, fontColor, fontSize, fontWeight });
     // send the updated values to netflix_subtitles.js on submit
@@ -220,13 +221,17 @@ const formListener = (currentTab = {}) => {
 };
 
 // runs when the popup.html is open
-chrome.tabs.query(queryOptions, (tabs) => {
-  if (!tabs) return;
-  const [currentTab] = tabs;
-  if (!checkUrlIsNetFlix(currentTab)) return;
-  // create parents like form, lengend, button, ul...
-  createParentElements();
-  // create elements inside the form i.e li,labels, inputs...
-  createFormLabels();
-  formListener(currentTab);
-});
+(function () {
+  let queryOptions = { active: true, currentWindow: true };
+  chrome.tabs.query(queryOptions, (tabs) => {
+    if (!tabs) return;
+    const [currentTab] = tabs;
+    if (!checkUrlIsNetFlix(currentTab)) return;
+    // create parents like form, lengend, button, ul...
+    createParentElements();
+    // create elements inside the form i.e li,labels, inputs...
+    createFormLabels();
+    // listen for submission
+    formListener(currentTab);
+  });
+})();
