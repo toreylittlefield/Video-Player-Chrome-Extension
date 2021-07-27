@@ -233,6 +233,7 @@ const sendOptionsMessage = (
       if (responseSubtitles?.message === 'netflix subtitles styles enabled') {
         console.log({ subTitlesMsg: responseSubtitles.message });
       }
+      // reset to the default netflix values received from netflix_subtitles.js
       if (responseSubtitles?.message === 'reset_subtitles') {
         setSubtitlesOptionsInChromeStorage(responseSubtitles.payload);
         inputAndSelectIdsToSubmit().map((inputId) => {
