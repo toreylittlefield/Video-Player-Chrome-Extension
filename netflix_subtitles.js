@@ -44,7 +44,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'update_netflix_subtitles_styles') {
     const {
       verticalPosition = 0,
-      fontSize = 70,
+      fontSize = 32,
       fontColor = 'currentColor',
       fontWeight = 'normal',
     } = request.payload;
