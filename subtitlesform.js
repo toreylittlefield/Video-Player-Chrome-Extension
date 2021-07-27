@@ -4,6 +4,11 @@ const checkUrlIsNetFlix = (tab) => {
   return regex.test(tab?.url);
 };
 
+const inputAndSelectIdsToSubmit = () => {
+  const formToSubmit = document.querySelector('#subtitles-form');
+  return Array.from(formToSubmit?.querySelectorAll('input, select')).map((element) => element.id);
+};
+
 // create our option elements
 const createSelectOptionElements = (key = '', propValue = []) => {
   if (key !== 'options') return;
@@ -70,12 +75,28 @@ const createParentElements = () => {
     },
     { tagName: 'ul', textContent: '', id: '', className: 'form-list', type: '', appendAsChild: 'fieldset' },
     {
+      tagName: 'div',
+      textContent: '',
+      id: '',
+      className: 'buttons-container',
+      type: '',
+      appendAsChild: 'fieldset',
+    },
+    {
       tagName: 'button',
       textContent: 'Change Subtitles',
       id: '',
       className: 'set-subtitles-btn',
       type: 'submit',
-      appendAsChild: 'fieldset',
+      appendAsChild: '.buttons-container',
+    },
+    {
+      tagName: 'button',
+      textContent: 'Reset Subtitles',
+      id: '',
+      className: 'reset-subtitles-btn',
+      type: 'click',
+      appendAsChild: '.buttons-container',
     },
   ];
   createElements(elements);
@@ -212,6 +233,18 @@ const sendOptionsMessage = (
       if (responseSubtitles?.message === 'netflix subtitles styles enabled') {
         console.log({ subTitlesMsg: responseSubtitles.message });
       }
+      if (responseSubtitles?.message === 'reset_subtitles') {
+        setSubtitlesOptionsInChromeStorage(responseSubtitles.payload);
+        console.log({ payloadSubs: responseSubtitles.payload });
+        const [verticalPosition, fontSize, fontColor, fontWeight] = [
+          ...inputAndSelectIdsToSubmit().map((inputId) => {
+            console.log([inputId], [inputId].value, payload[inputId]);
+            return (document.querySelector('#' + inputId).value = responseSubtitles.payload[inputId]);
+          }),
+        ];
+        console.log({ verticalPosition, fontSize, fontColor, fontWeight });
+        // createFormLabels(responseSubtitles.payload);
+      }
     }
   );
 };
@@ -219,14 +252,12 @@ const sendOptionsMessage = (
 // add the form listener
 const formListener = (currentTab = {}) => {
   const formToSubmit = document.querySelector('#subtitles-form');
-  const inputAndSelectIdsToSubmit = Array.from(formToSubmit?.querySelectorAll('input, select')).map(
-    (element) => element.id
-  );
+  const inputsToSelect = inputAndSelectIdsToSubmit();
 
   formToSubmit.addEventListener('submit', (event) => {
     event.preventDefault();
     const [verticalPosition, fontSize, fontColor, fontWeight] = [
-      ...inputAndSelectIdsToSubmit.map((inputId) => event.target[inputId].value),
+      ...inputsToSelect.map((inputId) => event.target[inputId].value),
     ];
     // send the updated values to netflix_subtitles.js on submit
     sendOptionsMessage(currentTab, 'update_netflix_subtitles_styles', {
@@ -237,6 +268,19 @@ const formListener = (currentTab = {}) => {
     });
     // set options in chrome storage
     setSubtitlesOptionsInChromeStorage({ payload: { verticalPosition, fontSize, fontColor, fontWeight } });
+  });
+
+  // reset the values for subtitles to the defaults
+  const resetButton = document.querySelector('.reset-subtitles-btn');
+  resetButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    sendOptionsMessage(currentTab, 'reset_subtitles', {
+      verticalPosition: 0,
+      fontSize: 0,
+      fontColor: '',
+      fontWeight: '',
+    });
   });
 };
 
