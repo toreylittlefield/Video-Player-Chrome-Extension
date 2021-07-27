@@ -51,9 +51,8 @@ const checkForVideo = () => document.querySelector('video')?.playbackRate ?? nul
 // run when a new active tab and send store user playbackspeed to the contentScript event listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (tab.active && changeInfo.status === 'complete' && /^http/.test(tab.url)) {
-    // netflix
+    // netflix subtitles
     if (regex.test(tab.url)) {
-      console.log({ tabId, changeInfo, tab });
       setEnabledPopup(tab.id);
       chrome.scripting.executeScript(
         {
@@ -61,23 +60,22 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           files: ['netflix_subtitles.js'],
         },
         () => {
-          chrome.tabs.sendMessage(
-            tabId,
-            {
-              message: 'update_netflix_subtitles_styles',
-              payload: {
-                verticalPosition: 0,
-                fontSize: 70,
-                fontColor: '#FFF',
-                fontWeight: 'normal',
-              },
-            },
-            (subResponse) => {
-              if (subResponse?.message === 'netflix subtitles styles enabled') {
-                console.log({ subTitlesMsg: subResponse.message });
-              }
+          chrome.storage.local.get('subtitlesOptions', (data) => {
+            if (data) {
+              chrome.tabs.sendMessage(
+                tabId,
+                {
+                  message: 'update_netflix_subtitles_styles',
+                  payload: data.subtitlesOptions,
+                },
+                (subResponse) => {
+                  if (subResponse?.message === 'netflix subtitles styles enabled') {
+                    console.log({ subTitlesMsg: subResponse.message });
+                  }
+                }
+              );
             }
-          );
+          });
         }
       );
     }
@@ -90,7 +88,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           },
           'getPlayBackSpeedOnPageLoad'
         );
-        // }
       }
     });
   }
@@ -102,14 +99,14 @@ const getCurrentTab = async () => {
   return tab;
 };
 
-const setOrUpdateChromeStorage = (request = { payload: Number }) => {
+const setOrUpdateChromeStorage = (request = { payload: Number }, type = '') => {
   chrome.storage.local.set({
-    playbackspeed: request.payload,
+    [type]: request.payload,
   });
 };
 
 chrome.runtime.onInstalled.addListener(async () => {
-  setOrUpdateChromeStorage({ payload: 1 });
+  setOrUpdateChromeStorage({ payload: 1 }, 'playbackspeed');
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -136,7 +133,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       message: 'success',
       payload: 'got your message slider',
     });
-    setOrUpdateChromeStorage(request);
+    setOrUpdateChromeStorage(request, 'playbackspeed');
     updateVideoSpeedInCurrentTabWindow(request);
     return;
   }
