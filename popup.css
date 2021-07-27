@@ -154,24 +154,33 @@ input:active ~ .current-speed-container h2 {
   opacity: 0;
 }
 
-.custom-button {
+button {
   border: 0.01em rgba(0, 0, 0, 0.3) solid;
   border-radius: 0.6em;
   padding: 0.5em;
   font-size: 1.25em;
-  background-color: rgba(138, 29, 138, 1);
-  color: hsl(0, 0%, 95%);
   transition: all 0.2s ease-in-out;
   box-shadow: 3px 3.5px 2px 1px rgba(0, 0, 0, 0.3);
 }
+
+button:hover {
+  transform: translateX(2%) scale(1.05);
+}
+
+button:active {
+  transform: translateX(-1%) translateY(3%) scale(1.02);
+  box-shadow: none;
+}
+
+.custom-button {
+  background-color: rgba(138, 29, 138, 1);
+  color: hsl(0, 0%, 95%);
+}
 .custom-button:hover {
   background-color: rgba(102, 7, 102, 0.85);
-  transform: translateX(2%) scale(1.05);
 }
 .custom-button:active {
   background-color: rgba(73, 11, 73, 0.75);
-  transform: translateX(-1%) translateY(3%) scale(1.02);
-  box-shadow: none;
 }
 
 /* Netflix Subtitles */
@@ -185,6 +194,35 @@ input:active ~ .current-speed-container h2 {
   display: flex;
   gap: 20px;
   flex-direction: column;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 2em;
+}
+
+.reset-subtitles-btn {
+  background-color: rgb(175, 22, 22);
+  color: hsl(0, 0%, 95%);
+}
+.reset-subtitles-btn:hover {
+  background-color: rgba(175, 22, 22, 0.85);
+}
+.reset-subtitles-btn:active {
+  background-color: rgba(175, 22, 22, 0.65);
+}
+
+.set-subtitles-btn {
+  background-color: rgb(59, 69, 97);
+  color: hsl(0, 0%, 95%);
+}
+.set-subtitles-btn:hover {
+  background-color: rgba(59, 69, 97, 0.85);
+}
+.set-subtitles-btn:active {
+  background-color: rgba(59, 69, 97, 0.65);
 }
 
 li {
