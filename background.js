@@ -154,25 +154,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   }
-
-  // if (request.message === 'isNetFlix') {
-  //   console.log('isNetflix');
-  //   console.log({ isNetlfix: request.message });
-  //   let queryOptions = { active: true, currentWindow: true };
-  //   chrome.tabs.query(queryOptions, (tabs) => {
-  //     if (tabs) {
-  //       const [currentTab] = tabs;
-  //       console.log(currentTab);
-  //       console.log({ currentTabURL: currentTab.url });
-  //       if (regex.test(currentTab?.url)) {
-  //         console.log('sending back success message to popup.html for netflix form...');
-  //         sendResponse({
-  //           message: 'success',
-  //           payload: true,
-  //         });
-  //       }
-  //     }
-  //   });
-  //   return true;
-  // }
 });
