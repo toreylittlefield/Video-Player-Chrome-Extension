@@ -235,15 +235,9 @@ const sendOptionsMessage = (
       }
       if (responseSubtitles?.message === 'reset_subtitles') {
         setSubtitlesOptionsInChromeStorage(responseSubtitles.payload);
-        console.log({ payloadSubs: responseSubtitles.payload });
-        const [verticalPosition, fontSize, fontColor, fontWeight] = [
-          ...inputAndSelectIdsToSubmit().map((inputId) => {
-            console.log([inputId], [inputId].value, payload[inputId]);
-            return (document.querySelector('#' + inputId).value = responseSubtitles.payload[inputId]);
-          }),
-        ];
-        console.log({ verticalPosition, fontSize, fontColor, fontWeight });
-        // createFormLabels(responseSubtitles.payload);
+        inputAndSelectIdsToSubmit().map((inputId) => {
+          return (document.querySelector('#' + inputId).value = responseSubtitles.payload[inputId]);
+        });
       }
     }
   );
