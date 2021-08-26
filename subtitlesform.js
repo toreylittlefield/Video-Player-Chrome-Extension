@@ -46,6 +46,7 @@ const createElements = (elements = [{}]) => {
   });
 };
 
+// for fun just creating element dymanically in a weird way
 const createParentElements = () => {
   const elements = [
     {
