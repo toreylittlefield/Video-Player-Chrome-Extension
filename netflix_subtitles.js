@@ -1,29 +1,11 @@
+import { RGBtoHEXColor } from './utils';
+
 // The default values collected on runtime
-const storedDefaults = {
+let storedDefaults = {
   verticalPosition: null,
   fontSize: null,
   fontColor: null,
   fontWeight: null,
-};
-
-// https://css-tricks.com/converting-color-spaces-in-javascript/
-const RGBtoHEXColor = (fontColor = '') => {
-  const isRGB = fontColor.includes('rgb(');
-  if (!isRGB) return fontColor;
-  // Choose correct separator
-  let sep = fontColor.indexOf(',') > -1 ? ',' : ' ';
-  // Turn "rgb(r,g,b)" into [r,g,b]
-  rgb = fontColor.substr(4).split(')')[0].split(sep);
-
-  let r = (+rgb[0]).toString(16),
-    g = (+rgb[1]).toString(16),
-    b = (+rgb[2]).toString(16);
-
-  if (r.length == 1) r = '0' + r;
-  if (g.length == 1) g = '0' + g;
-  if (b.length == 1) b = '0' + b;
-
-  return '#' + r + g + b;
 };
 
 // save of values in chrome local storage
@@ -66,18 +48,16 @@ changeSubtitlesStyle = (
         // the subtitles texts
         const styleChildren = (parentElement = {}) => {
           const subtitleSpans = parentElement.children;
-          if (subtitleSpans) {
-            for (const span of Array.from(subtitleSpans)) {
-              // remaining defaults to stored
-              if (storedDefaults.fontSize === null) storedDefaults.fontSize = parseFloat(span.style.fontSize);
-              if (storedDefaults.fontColor === null)
-                storedDefaults.fontColor = RGBtoHEXColor(span.style.color);
-              if (storedDefaults.fontWeight === null) storedDefaults.fontWeight = span.style.fontWeight;
-              // custom styles applied
-              span.style.fontSize = fontSize + 'px';
-              span.style.fontWeight = fontWeight;
-              span.style.color = fontColor;
-            }
+          if (!subtitleSpans.length) return;
+          for (const span of [...subtitleSpans]) {
+            // remaining defaults to stored
+            if (storedDefaults.fontSize === null) storedDefaults.fontSize = parseFloat(span.style.fontSize);
+            if (storedDefaults.fontColor === null) storedDefaults.fontColor = RGBtoHEXColor(span.style.color);
+            if (storedDefaults.fontWeight === null) storedDefaults.fontWeight = span.style.fontWeight;
+            // custom styles applied
+            span.style.fontSize = fontSize + 'px';
+            span.style.fontWeight = fontWeight;
+            span.style.color = fontColor;
           }
         };
         // style the all the spans with the values
