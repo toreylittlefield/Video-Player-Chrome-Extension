@@ -29,6 +29,12 @@ const updatePlaybackSpeedInCurrentTab = async (
       payload: request.payload,
     },
     (response) => {
+      console.log({ response });
+      const { lastError = '' } = chrome.runtime;
+      if (lastError) {
+        console.log(lastError);
+        return;
+      }
       // should only run once on video load getPlayBackSpeedOnPageLoad to enable the popup
       if (response?.message === 'success' && message === 'getPlayBackSpeedOnPageLoad') {
         console.log('enabled!');
@@ -52,11 +58,10 @@ const updateVideoSpeedInCurrentTabWindow = async (request) => {
 
 const regex = new RegExp('netflix', 'g');
 
-// const checkForVideo = () => document.querySelector('video')?.playbackRate ?? null;
-
 // run when a new active tab and send store user playbackspeed to the contentScript event listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (tab.active && changeInfo.status === 'complete' && /^http/.test(tab.url)) {
+    console.log(tabId, changeInfo, tab);
     // netflix subtitles
     if (regex.test(tab.url)) {
       setEnabledPopup(tab.id);
