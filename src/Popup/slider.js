@@ -7,6 +7,11 @@ const sendUpdatedPlaybackSpeedToBackground = (newValueFromSlider) => {
       payload: newValueFromSlider,
     },
     (response) => {
+      const { lastError = '' } = chrome.runtime;
+      if (lastError) {
+        console.log(lastError);
+        return;
+      }
       if (response.message === 'success') {
         console.log('background to slider message:');
         console.log({ message: response.message, payload: response.payload });
@@ -64,6 +69,11 @@ chrome.runtime.sendMessage(
     payload: null,
   },
   (backgroundJSRes) => {
+    const { lastError = '' } = chrome.runtime;
+    if (lastError) {
+      console.log(lastError);
+      return;
+    }
     if (backgroundJSRes?.message === 'success') {
       console.log('slider.js : chrome storage value response on popup open from background.js');
       console.log({ backgroundJSRes });
