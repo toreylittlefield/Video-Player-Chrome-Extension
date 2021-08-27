@@ -1,4 +1,7 @@
 import RGBtoHEXColor from '../Utils/RGBtoHEXColor';
+import addVideoSelector from './netflix_video';
+
+addVideoSelector();
 
 // The default values collected on runtime
 const storedDefaults = {
@@ -49,32 +52,36 @@ const changeSubtitlesStyle = (
       subtitles.style.bottom = `${verticalPosition}px`;
 
       // .player-timedtext-text-container
-      const firstChildContainer = subtitles.firstChild;
-      if (firstChildContainer) {
-        // center the subtitles
-        firstChildContainer.style.left = '0';
-        firstChildContainer.style.right = '0';
+      const textContainers = subtitles.querySelectorAll('.player-timedtext-text-container');
+      [...textContainers].forEach((container) => {
+        if (container) {
+          // center the subtitles
+          const firstChildContainer = container;
+          firstChildContainer.style.left = '0';
+          firstChildContainer.style.right = '0';
 
-        // the subtitles texts
-        const styleChildren = (parentElement = {}) => {
-          const subtitleSpans = parentElement.children;
-          if (!subtitleSpans.length) return;
-          // for (const span of [...subtitleSpans]) {
-          [...subtitleSpans].forEach((el) => {
-            // remaining defaults to stored
-            const span = el;
-            if (storedDefaults.fontSize === null) storedDefaults.fontSize = parseFloat(span.style.fontSize);
-            if (storedDefaults.fontColor === null) storedDefaults.fontColor = RGBtoHEXColor(span.style.color);
-            if (storedDefaults.fontWeight === null) storedDefaults.fontWeight = span.style.fontWeight;
-            // custom styles applied
-            span.style.fontSize = `${fontSize}px`;
-            span.style.fontWeight = fontWeight;
-            span.style.color = fontColor;
-          });
-        };
-        // style the all the spans with the values
-        styleChildren(firstChildContainer);
-      }
+          // the subtitles texts
+          const styleChildren = (parentElement = {}) => {
+            const subtitleSpans = parentElement.children;
+            if (!subtitleSpans.length) return;
+            // for (const span of [...subtitleSpans]) {
+            [...subtitleSpans].forEach((el) => {
+              // remaining defaults to stored
+              const span = el;
+              if (storedDefaults.fontSize === null) storedDefaults.fontSize = parseFloat(span.style.fontSize);
+              if (storedDefaults.fontColor === null)
+                storedDefaults.fontColor = RGBtoHEXColor(span.style.color);
+              if (storedDefaults.fontWeight === null) storedDefaults.fontWeight = span.style.fontWeight;
+              // custom styles applied
+              span.style.fontSize = `${fontSize}px`;
+              span.style.fontWeight = fontWeight;
+              span.style.color = fontColor;
+            });
+          };
+          // style the all the spans with the values
+          styleChildren(firstChildContainer);
+        }
+      });
     }
   };
   MutationObserverFunction(observeSubtitles);
@@ -82,6 +89,7 @@ const changeSubtitlesStyle = (
 
 // listen for requests on runtime
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // if (prevObserver) prevObserver.disconnect();
   if (request.message === 'update_netflix_subtitles_styles') {
     const {
       verticalPosition = 0,
