@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module" src="slider.js" defer></script>
+    <script type="module" src="subtitlesform.js" defer></script>
+    <link rel="stylesheet" href="popup.css" />
+    <title>Video Playback Rate Controller</title>
+  </head>
+  <body>
+    <h1>Video Playback Rate</h1>
+    <input class="slider-input" value="1.0" type="range" max="100" />
+    <div id="h4-container">
+      <div id="h4-subcontainer">
+        <h4>1.0<span></span></h4>
+      </div>
+    </div>
+    <div class="current-speed-container">
+      <h2>Current Speed <strong>1.0X</strong></h2>
+      <button class="custom-button">Reset Speed</button>
+    </div>
+    <section class="subtitles-container"></section>
+  </body>
+</html>

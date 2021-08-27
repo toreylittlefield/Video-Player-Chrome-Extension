@@ -1,0 +1,250 @@
+/* Range Slider From https://codepen.io/brandonmcconnell/pen/oJBVQW */
+html {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Work Sans', sans-serif;
+  text-align: center;
+}
+html h1,
+html h2,
+html h3,
+html h4,
+html h5,
+html h6 {
+  margin: 0;
+}
+html h1,
+html h2 {
+  color: rgba(53, 52, 52, 1);
+  font-weight: 500;
+}
+html h3 {
+  color: #aaa;
+  font-weight: 500;
+}
+html h4 {
+  color: #999;
+  font-weight: 500;
+}
+html h4:after {
+  content: 'X';
+  padding-left: 1px;
+}
+html input[type='range'] {
+  outline: 0;
+  border: 0;
+  border-radius: 500px;
+  width: 400px;
+  max-width: 100%;
+  margin: 24px 0 16px;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+html input[type='range'] {
+  overflow: hidden;
+  height: 40px;
+  -webkit-appearance: none;
+  background-color: #ddd;
+}
+html input[type='range']::-webkit-slider-runnable-track {
+  height: 40px;
+  -webkit-appearance: none;
+  color: #444;
+  -webkit-transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
+}
+html input[type='range']::-webkit-slider-thumb {
+  width: 40px;
+  -webkit-appearance: none;
+  height: 40px;
+  cursor: ew-resize;
+  background: #fff;
+  box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 40px #1597ff;
+  border-radius: 50%;
+  -webkit-transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
+  position: relative;
+}
+html input[type='range']:active::-webkit-slider-thumb {
+  background: #fff;
+  box-shadow: -340px 0 0 320px #1597ff, inset 0 0 0 3px #1597ff;
+}
+html input[type='range']::-moz-range-progress {
+  background-color: #43e5f7;
+}
+html input[type='range']::-moz-range-track {
+  background-color: #9a905d;
+}
+html input[type='range']::-ms-fill-lower {
+  background-color: #43e5f7;
+}
+html input[type='range']::-ms-fill-upper {
+  background-color: #9a905d;
+}
+
+#h4-container {
+  width: 400px;
+  max-width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: relative;
+}
+#h4-container #h4-subcontainer {
+  width: 100%;
+  position: relative;
+}
+#h4-container #h4-subcontainer h4 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  color: #fff !important;
+  font-size: 12px;
+  transform-origin: center -10px;
+  transform: translateX(-50%);
+  transition: margin-top 0.15s ease-in-out, opacity 0.15s ease-in-out;
+}
+#h4-container #h4-subcontainer h4 span {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #1597ff;
+  border-radius: 0 50% 50% 50%;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+input:not(:active) + #h4-container h4 {
+  opacity: 0;
+  margin-top: -50px;
+  pointer-events: none;
+}
+
+/* To Display Current Selected Speed */
+
+.current-speed-container {
+  display: flex;
+  align-content: flex-start;
+  align-items: center;
+  justify-content: space-around;
+  text-align: left;
+}
+
+.current-speed-container h2 {
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.5em;
+  color: rgba(53, 52, 52, 0.8);
+  transition: all 0.2s ease-in-out;
+}
+
+.current-speed-container h2 strong {
+  font-style: normal;
+  color: rgba(53, 52, 52, 1);
+}
+
+input:active ~ .current-speed-container h2 {
+  opacity: 0;
+}
+
+button {
+  border: 0.01em rgba(0, 0, 0, 0.3) solid;
+  border-radius: 0.6em;
+  padding: 0.5em;
+  font-size: 1.25em;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 3px 3.5px 2px 1px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+  transform: translateX(2%) scale(1.05);
+}
+
+button:active {
+  transform: translateX(-1%) translateY(3%) scale(1.02);
+  box-shadow: none;
+}
+
+.custom-button {
+  background-color: rgba(138, 29, 138, 1);
+  color: hsl(0, 0%, 95%);
+}
+.custom-button:hover {
+  background-color: rgba(102, 7, 102, 0.85);
+}
+.custom-button:active {
+  background-color: rgba(73, 11, 73, 0.75);
+}
+
+/* Netflix Subtitles */
+.subtitles-container {
+  margin-top: 5em;
+}
+
+.subtitles-container ul {
+  padding-inline-start: 0;
+  text-align: start;
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 2em;
+}
+
+.reset-subtitles-btn {
+  background-color: rgb(175, 22, 22);
+  color: hsl(0, 0%, 95%);
+}
+.reset-subtitles-btn:hover {
+  background-color: rgba(175, 22, 22, 0.85);
+}
+.reset-subtitles-btn:active {
+  background-color: rgba(175, 22, 22, 0.65);
+}
+
+.set-subtitles-btn {
+  background-color: rgb(59, 69, 97);
+  color: hsl(0, 0%, 95%);
+}
+.set-subtitles-btn:hover {
+  background-color: rgba(59, 69, 97, 0.85);
+}
+.set-subtitles-btn:active {
+  background-color: rgba(59, 69, 97, 0.65);
+}
+
+li {
+  list-style-type: none;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 20px;
+}
+
+li label {
+  width: 65%;
+}
+
+li input,
+li select {
+  width: 35%;
+}
+
+/* For disabled.html */
+.disabled {
+  display: grid;
+  width: 200px;
+  place-items: center;
+}
