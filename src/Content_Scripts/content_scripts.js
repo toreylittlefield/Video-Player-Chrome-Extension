@@ -96,7 +96,6 @@ const checkForVideoInChildNodes = (node = {}, parent = {}) => {
   // // jw-video jw-reset parent className for the typical  jw-player
   // node.className === 'jw-video jw-reset'
   if (node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO') {
-    console.log({ node, parent });
     addListenerToVideoTagAndSendVideoFoundMessage(parent);
     // recurse over any child nodes
   } else if (node.children !== undefined) {

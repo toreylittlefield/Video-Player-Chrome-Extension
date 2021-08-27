@@ -38,7 +38,6 @@ const createElements = (elements = [{}]) => {
     keys.forEach((key) => {
       if (key === 'tagName' || key === 'appendAsChild' || el[key] === '' || el[key] === null) return;
       const propValue = el[key];
-      console.log({ key, el, propValue });
       // create options elements for select elements
       if (key === 'options') createSelectOptionElements(key, propValue);
       if (key !== 'options') createdElement[key] = propValue;
