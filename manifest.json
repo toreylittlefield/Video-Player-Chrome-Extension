@@ -1,7 +1,7 @@
 {
   "name": "Video Playback Speeds",
   "action": {
-    "default_popup": "disabled.html",
+    "default_popup": "./src/Popup/disabled.html",
     "default_title": "Control Video Playback Speed",
     "default_icon": {
       "16": "images/online-video_16.png",
@@ -13,9 +13,7 @@
   "version": "0.1",
   "description": "Controls Playback Speeds For Videos",
   "permissions": ["activeTab", "tabs", "scripting", "storage"],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "background": { "service_worker": "service_worker.js" },
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "images/online-video_16.png",
@@ -27,7 +25,7 @@
       "matches": ["<all_urls>"],
       "run_at": "document_start",
       "all_frames": true,
-      "js": ["contentScript.js"]
+      "js": ["./dist/content_scripts.js"]
     }
   ]
 }
