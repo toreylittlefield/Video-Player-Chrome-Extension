@@ -29,7 +29,6 @@ const updatePlaybackSpeedInCurrentTab = async (
       payload: request.payload,
     },
     (response) => {
-      console.log({ response });
       const { lastError = '' } = chrome.runtime;
       if (lastError) {
         console.log(lastError);
@@ -59,6 +58,7 @@ const updateVideoSpeedInCurrentTabWindow = async (request) => {
 const regex = new RegExp('netflix', 'g');
 
 // run when a new active tab and send store user playbackspeed to the contentScript event listener
+
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (tab.active && changeInfo.status === 'complete' && /^http/.test(tab.url)) {
     console.log(tabId, changeInfo, tab);

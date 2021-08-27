@@ -36,8 +36,6 @@ const changeSubtitlesStyle = (
   fontWeight = 'currentColor'
   // disconnect = false
 ) => {
-  console.log('%cnetflix-subtitles-styler : observer is working... ', 'color: red;');
-
   // observing
   const observeSubtitles = () => {
     // .player-timedText
@@ -97,12 +95,10 @@ if (!chrome.runtime.onMessage.hasListeners()) {
         fontColor = 'currentColor',
         fontWeight = 'normal',
       } = request.payload;
-      console.log('Waiting for subtitles selector');
       const waitForLoad = setInterval(() => {
         const subtitlesSelectorFound = () => document?.querySelector('.player-timedtext');
         // wait to find the subtitles which are spans in the .player-timedtext-text-container...
         if (subtitlesSelectorFound()?.firstChild) {
-          console.log('found subtitles...');
           changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
           clearInterval(waitForLoad);
         }

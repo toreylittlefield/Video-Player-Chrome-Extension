@@ -40,7 +40,6 @@ const setThePlaybackRateNetflix = (videoElement = {}, request = { payload: Numbe
 
 // hack to check if the default playback speed is overiding our user playback speed from chrome on page load
 const setAndCheckVideoPlayBackRate = (request = { payload: Number }, videoElement = {}) => {
-  console.log({ request, videoElement });
   if (request.payload === undefined || !videoElement) return true;
   const currentPlayBackRate = videoElement.playbackRate;
   const payload = Number(request.payload);
@@ -64,10 +63,8 @@ const attachVideoListener = (parent = {}, isNetflix = false) => {
     setThePlaybackRateNetflix(videoElement, sendRequest.request);
   }
 
-  console.log('adding video listeners...');
   // listen to messages to update the playback speed value based on slider & chrome storage
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log({ request, sender, sendResponse });
     if (request.message === 'changePlaybackSpeed' || request.message === 'getPlayBackSpeedOnPageLoad') {
       if (
         document.location.hostname === 'www.netflix.com' &&
@@ -110,7 +107,6 @@ const attachVideoListener = (parent = {}, isNetflix = false) => {
     return true;
   });
   // send message to chrome background.js and retrieve the playbackrate
-  console.log('found video and sending message...');
   updatePlayBackRateBG(videoElement);
   return true;
 };

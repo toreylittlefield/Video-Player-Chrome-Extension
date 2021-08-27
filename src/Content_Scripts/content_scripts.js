@@ -45,7 +45,6 @@ const getAllDocs = () => {
 };
 
 const checkIsNetFlix = async () => {
-  console.log('checking url...');
   const regex = new RegExp('netflix', 'g');
   if (regex.test(document.location.orgin) || regex.test(document.URL)) {
     return true;
@@ -56,7 +55,7 @@ const checkIsNetFlix = async () => {
 (async function init() {
   const isNetflix = await checkIsNetFlix();
   if (!isNetflix && window.document) {
-    console.log('Running Mutation Observer');
+    console.log('Running Mutation Observer To Find Videos');
     const allDocsOnPage = getAllDocs();
     allDocsOnPage.forEach(mutate);
   }
