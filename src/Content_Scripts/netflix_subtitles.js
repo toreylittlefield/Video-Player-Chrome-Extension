@@ -1,8 +1,6 @@
 import RGBtoHEXColor from '../Utils/RGBtoHEXColor';
 import addVideoSelector from './netflix_video';
 
-addVideoSelector();
-
 // The default values collected on runtime
 const storedDefaults = {
   verticalPosition: null,
@@ -88,51 +86,54 @@ const changeSubtitlesStyle = (
 };
 
 // listen for requests on runtime
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // if (prevObserver) prevObserver.disconnect();
-  if (request.message === 'update_netflix_subtitles_styles') {
-    const {
-      verticalPosition = 0,
-      fontSize = 32,
-      fontColor = 'currentColor',
-      fontWeight = 'normal',
-    } = request.payload;
-    console.log('Waiting for subtitles selector');
-    const waitForLoad = setInterval(() => {
-      const subtitlesSelectorFound = () => document?.querySelector('.player-timedtext');
-      // wait to find the subtitles which are spans in the .player-timedtext-text-container...
-      if (subtitlesSelectorFound()?.firstChild) {
-        console.log('found subtitles...');
-        changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
-        clearInterval(waitForLoad);
-      }
-    }, 1000);
-    sendResponse({
-      message: 'netflix subtitles styles enabled',
-      payload: null,
-    });
+if (!chrome.runtime.onMessage.hasListeners()) {
+  addVideoSelector();
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    // if (prevObserver) prevObserver.disconnect();
+    if (request.message === 'update_netflix_subtitles_styles') {
+      const {
+        verticalPosition = 0,
+        fontSize = 32,
+        fontColor = 'currentColor',
+        fontWeight = 'normal',
+      } = request.payload;
+      console.log('Waiting for subtitles selector');
+      const waitForLoad = setInterval(() => {
+        const subtitlesSelectorFound = () => document?.querySelector('.player-timedtext');
+        // wait to find the subtitles which are spans in the .player-timedtext-text-container...
+        if (subtitlesSelectorFound()?.firstChild) {
+          console.log('found subtitles...');
+          changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
+          clearInterval(waitForLoad);
+        }
+      }, 1000);
+      sendResponse({
+        message: 'netflix subtitles styles enabled',
+        payload: null,
+      });
+      return true;
+    }
+    // reset the subtitles to the default netflix values
+    if (request.message === 'reset_subtitles') {
+      // get the default values from netflix that were stored on runtime
+      const { verticalPosition, fontSize, fontColor, fontWeight } = storedDefaults;
+      // check if the values are null and if so do not send the message
+      const isNullValues = Object.keys(storedDefaults).every((key) => storedDefaults[key] === null);
+      if (isNullValues) return null;
+      // update the values in the mutation observer
+      changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
+      // save the values in chrome local storage
+      setSubtitlesOptionsInChromeStorage({ payload: { verticalPosition, fontSize, fontWeight, fontColor } });
+      // send the values to the subtitlesform.js
+      sendResponse({
+        message: 'reset_subtitles',
+        payload: { verticalPosition, fontSize, fontColor, fontWeight },
+      });
+      // reset the stored defaults in event they need to change with a different video
+      Object.keys(storedDefaults).forEach((key) => {
+        storedDefaults[key] = null;
+      });
+    }
     return true;
-  }
-  // reset the subtitles to the default netflix values
-  if (request.message === 'reset_subtitles') {
-    // get the default values from netflix that were stored on runtime
-    const { verticalPosition, fontSize, fontColor, fontWeight } = storedDefaults;
-    // check if the values are null and if so do not send the message
-    const isNullValues = Object.keys(storedDefaults).every((key) => storedDefaults[key] === null);
-    if (isNullValues) return null;
-    // update the values in the mutation observer
-    changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
-    // save the values in chrome local storage
-    setSubtitlesOptionsInChromeStorage({ payload: { verticalPosition, fontSize, fontWeight, fontColor } });
-    // send the values to the subtitlesform.js
-    sendResponse({
-      message: 'reset_subtitles',
-      payload: { verticalPosition, fontSize, fontColor, fontWeight },
-    });
-    // reset the stored defaults in event they need to change with a different video
-    Object.keys(storedDefaults).forEach((key) => {
-      storedDefaults[key] = null;
-    });
-  }
-  return true;
-});
+  });
+}
