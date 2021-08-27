@@ -239,6 +239,11 @@ const sendOptionsMessage = (
       payload: { verticalPosition, fontSize, fontColor, fontWeight },
     },
     (responseSubtitles) => {
+      const { lastError = '' } = chrome.runtime;
+      if (lastError) {
+        console.log(lastError);
+        return;
+      }
       if (responseSubtitles?.message === 'netflix subtitles styles enabled') {
         console.log({ subTitlesMsg: responseSubtitles.message });
       }
