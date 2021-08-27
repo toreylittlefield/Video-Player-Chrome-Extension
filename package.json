@@ -1,0 +1,42 @@
+{
+  "name": "video-player-chrome-extension",
+  "version": "0.0.1",
+  "description": "A Chrome / Chromium web extensions to adjust and customize  video playback rates and Netflix subtitle styles",
+  "scripts": {
+    "lint": "npx eslint src test",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier src test --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toreylittlefield/Video-Player-Chrome-Extension.git"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "web",
+    "extension",
+    "video",
+    "playback",
+    "subtitles",
+    "styling"
+  ],
+  "author": "Torey Littlefield",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toreylittlefield/Video-Player-Chrome-Extension/issues"
+  },
+  "homepage": "https://github.com/toreylittlefield/Video-Player-Chrome-Extension#readme",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "prettier": "2.3.2",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
+  }
+}
