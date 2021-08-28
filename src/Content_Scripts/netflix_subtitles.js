@@ -9,6 +9,8 @@ const storedDefaults = {
   fontWeight: null,
 };
 
+let currentObserver = null;
+
 // save of values in chrome local storage
 const setSubtitlesOptionsInChromeStorage = (
   request = { payload: { verticalPosition: Number, fontColor: '', fontSize: Number, fontWeight: Number } }
@@ -33,9 +35,16 @@ const changeSubtitlesStyle = (
   verticalPosition = 0,
   fontSize = 32,
   fontColor = 'currentColor',
-  fontWeight = 'currentColor'
-  // disconnect = false
+  fontWeight = 'currentColor',
+  disconnect = false
 ) => {
+  if (disconnect && currentObserver !== null) {
+    currentObserver.disconnect();
+    return;
+  }
+  if (currentObserver !== null) {
+    currentObserver.disconnect();
+  }
   // observing
   const observeSubtitles = () => {
     // .player-timedText
@@ -53,8 +62,13 @@ const changeSubtitlesStyle = (
         if (container) {
           // center the subtitles
           const firstChildContainer = container;
-          firstChildContainer.style.left = '0';
-          firstChildContainer.style.right = '0';
+          if (disconnect) {
+            // firstChildContainer.style.left = '';
+            // firstChildContainer.style.right = '';
+          } else {
+            firstChildContainer.style.left = '0';
+            firstChildContainer.style.right = '0';
+          }
 
           // the subtitles texts
           const styleChildren = (parentElement = {}) => {
@@ -80,7 +94,7 @@ const changeSubtitlesStyle = (
       });
     }
   };
-  MutationObserverFunction(observeSubtitles);
+  currentObserver = MutationObserverFunction(observeSubtitles);
 };
 
 // listen for requests on runtime
@@ -117,7 +131,7 @@ if (!chrome.runtime.onMessage.hasListeners()) {
       const isNullValues = Object.keys(storedDefaults).every((key) => storedDefaults[key] === null);
       if (isNullValues) return null;
       // update the values in the mutation observer
-      changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight);
+      changeSubtitlesStyle(verticalPosition, fontSize, fontColor, fontWeight, true);
       // save the values in chrome local storage
       setSubtitlesOptionsInChromeStorage({ payload: { verticalPosition, fontSize, fontWeight, fontColor } });
       // send the values to the subtitlesform.js
