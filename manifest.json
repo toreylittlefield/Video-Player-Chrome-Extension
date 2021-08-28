@@ -1,5 +1,5 @@
 {
-  "name": "Video Playback Speeds",
+  "name": "Change Video Playback Speeds",
   "action": {
     "default_popup": "./src/Popup/disabled.html",
     "default_title": "Control Video Playback Speed",
@@ -11,7 +11,7 @@
   },
   "manifest_version": 3,
   "version": "0.1",
-  "description": "Controls Playback Speeds For Videos",
+  "description": "Quickly adjust video playback speeds with a simple slider. Customize Netflix subtitles appearance.",
   "permissions": ["activeTab", "tabs", "scripting", "storage"],
   "background": { "service_worker": "service_worker.js" },
   "host_permissions": ["<all_urls>"],
