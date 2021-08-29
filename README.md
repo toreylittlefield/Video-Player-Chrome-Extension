@@ -52,4 +52,4 @@ This extension **DOES NOT** collect or monitor any user information.
 
 ### License
 
-This is [MIT licensed](./LICENSE).
+This is [MIT licensed](./LICENSE.TXT).
