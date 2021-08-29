@@ -1,4 +1,10 @@
-# Change Video Playback Speed
+<p align="center">
+  <img src="./Chrome Store/Screenshots/Youtube Screenshot.png" width="150"/>
+<img src="./Chrome Store/Screenshots/Netflix Screenshot.png" width="150"/>
+</p>
+
+<h1 align="center">Change Video Playback Speed</h1>
+<subtitles align="left">A Chrome Based Web Extension</subtitles>
 
 <!-- Insert Chrome Extension Webstore Link Later (https://reactjs.org/) -->
 
