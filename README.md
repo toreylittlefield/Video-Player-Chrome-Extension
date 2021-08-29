@@ -8,9 +8,9 @@
 
 ### Main Features
 
-- **Adjust video playback rates from 0.0X - 10.0X**
-- **Works with most HTML5 Video and embedded iframes including Netflix, Youtube, Amazon, Vimeo, JW Players etc...**
-- **Change the font-size, font-weight, horizontal and vertical positioning, as well as font-color of the subtitles in Netflix**
+- **Adjust video playback rates:** from 0.0X - 10.0X
+- **Works with most HTML5 Video:** embedded iframes including Netflix, Youtube, Amazon, Vimeo, JW Players etc...
+- **Change Netflix Subtitles Styles** the font-size, font-weight, horizontal and vertical positioning, as well as font-color of the subtitles in Netflix
 
 ## Why do it?
 
