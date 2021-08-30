@@ -9,7 +9,9 @@
 
 <h1 align="center">Change Video Playback Speed</h1>
 
-<!-- Insert Chrome Extension Webstore Link Later (https://reactjs.org/) -->
+## Link To Webstore
+
+[Available in the Chrome Webstore](https://chrome.google.com/webstore/detail/change-video-playback-spe/ncnbdjhoplchclmeanmckpmobhmodlio)
 
 ## What is it?
 
